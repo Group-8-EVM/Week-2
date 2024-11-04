@@ -2,8 +2,11 @@
 
 import { createPublicClient, http, hexToString } from "viem";
 import { sepolia } from "viem/chains";
-import { abi } from "@artifacts/contracts/Ballot.sol/Ballot.json";
-import { constants } from "@lib/constants";
+import { abi } from "../artifacts/contracts/Ballot.sol/Ballot.json";
+import * as dotenv from "dotenv";
+dotenv.config();
+
+const providerApiKey = process.env.ALCHEMY_API_KEY || "";
 
 const PROPOSAL_NAME_IDX = 0;
 const PROPOSAL_VOTES_IDX = 1;
@@ -15,22 +18,16 @@ async function main() {
   const parameters = process.argv.slice(2);
   const proposalIndex = parameters[ARG_PROPOSAL_NO_IDX];
   const contractAddress =
-    (parameters[ARG_CONTRACT_ADDRESS_IDX] as `0x${string}`) ||
-    constants.contracts.ballot.sepolia;
+    (parameters[ARG_CONTRACT_ADDRESS_IDX] as `0x${string}`);
 
-  if (!parameters || parameters.length < 1)
+  if (!parameters || parameters.length < 2)
     throw new Error(
-      "Parameters not provided. You must at least provide the proposal ID.",
+      "Parameters not provided. You must provide proposal and contract address",
     );
 
   if (isNaN(Number(proposalIndex))) throw new Error("Invalid proposal index");
 
-  if (!contractAddress)
-    throw new Error(
-      "Contract address not provided. Either set this in your environment variables, or provide it in the arguments.",
-    );
-
-  if (!/^0x[a-fA-F0-9]{40}$/.test(contractAddress))
+  if (!/^0x[a-fA-F0-9]{40}$/.test(contractAddress.toLowerCase()))
     throw new Error("Invalid contract address provided.");
 
   console.log(
@@ -41,7 +38,7 @@ async function main() {
   );
   const publicClient = createPublicClient({
     chain: sepolia,
-    transport: http(constants.integrations.alchemy.sepolia),
+    transport: http(`https://eth-sepolia.g.alchemy.com/v2/${providerApiKey}`),
   });
   const blockNumber = await publicClient.getBlockNumber();
   console.log("scripts -> GetProposals -> last block number", blockNumber);
