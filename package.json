@@ -1,0 +1,30 @@
+{
+  "name": "hardhat-project",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "hh:accounts": "hardhat accounts",
+    "hh:clean": "hardhat clean",
+    "deploy:hh": "hardhat run ./scripts/DeployWithHardhat.ts",
+    "deploy:hh:sepolia": "hardhat run ./scripts/DeployWithHardhat.ts --network sepolia",
+    "deploy:viem": "ts-node --files ./scripts/DeployWithViem.ts \"arg1\" \"arg2\" \"arg3\"",
+    "cast-vote": "npx ts-node --files ./scripts/CastVote.ts",
+    "get-proposal": "npx ts-node --files ./scripts/GetProposal.ts",
+    "grant-vote": "npx ts-node --files ./scripts/GiveRightToVote.ts",
+    "delegate": "npx ts-node --files ./scripts/Delegate.ts"
+  },
+  "author": "Mohammad Amir <amir@connextar.com>",
+  "license": "ISC",
+  "description": "Encode EVM BC 2024 Q4 - Lesson 05 - Hardhat Project",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox-viem": "^3.0.0",
+    "hardhat": "^2.22.15"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "typescript": "^5"
+  }
+}
