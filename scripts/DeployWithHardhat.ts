@@ -19,3 +19,8 @@ async function main() {
     console.log({ index, name, proposal });
   }
 }
+
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});
