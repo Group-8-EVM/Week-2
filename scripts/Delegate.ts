@@ -21,8 +21,7 @@ async function main() {
   const ARG_CONTRACT_ADDRESS_IDX = 1;
   const parameters = process.argv.slice(2);
   const targetAddress = parameters[ARG_TARGET_ADDRESS_IDX] as `0x${string}`;
-  const contractAddress =
-    (parameters[ARG_CONTRACT_ADDRESS_IDX] as `0x${string}`)
+  const contractAddress = parameters[ARG_CONTRACT_ADDRESS_IDX] as `0x${string}`;
   if (!parameters || parameters.length < 2)
     throw new Error(
       "Parameters not provided. You must provide the target voter address and the contract address.",

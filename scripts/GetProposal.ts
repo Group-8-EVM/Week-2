@@ -17,8 +17,7 @@ async function main() {
   const ARG_CONTRACT_ADDRESS_IDX = 1;
   const parameters = process.argv.slice(2);
   const proposalIndex = parameters[ARG_PROPOSAL_NO_IDX];
-  const contractAddress =
-    (parameters[ARG_CONTRACT_ADDRESS_IDX] as `0x${string}`);
+  const contractAddress = parameters[ARG_CONTRACT_ADDRESS_IDX] as `0x${string}`;
 
   if (!parameters || parameters.length < 2)
     throw new Error(

@@ -15,15 +15,13 @@ dotenv.config();
 const providerApiKey = process.env.ALCHEMY_API_KEY || "";
 const deployerPrivateKey = process.env.PRIVATE_KEY || "";
 
-
 async function main() {
   // Fetch parameters
   const ARG_TARGET_ADDRESS_IDX = 0;
   const ARG_CONTRACT_ADDRESS_IDX = 1;
   const parameters = process.argv.slice(2);
   const targetAddress = parameters[ARG_TARGET_ADDRESS_IDX] as `0x${string}`;
-  const contractAddress =
-    (parameters[ARG_CONTRACT_ADDRESS_IDX] as `0x${string}`)
+  const contractAddress = parameters[ARG_CONTRACT_ADDRESS_IDX] as `0x${string}`;
 
   if (!parameters || parameters.length < 1)
     throw new Error(
