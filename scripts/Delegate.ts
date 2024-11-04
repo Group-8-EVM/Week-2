@@ -1,6 +1,11 @@
 // noinspection DuplicatedCode
 
-import { createPublicClient, http, createWalletClient, formatEther } from "viem";
+import {
+  createPublicClient,
+  http,
+  createWalletClient,
+  formatEther,
+} from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
 import { abi } from "@artifacts/contracts/Ballot.sol/Ballot.json";
@@ -12,22 +17,34 @@ async function main() {
   const ARG_CONTRACT_ADDRESS_IDX = 1;
   const parameters = process.argv.slice(2);
   const targetAddress = parameters[ARG_TARGET_ADDRESS_IDX] as `0x${string}`;
-  const contractAddress = parameters[ARG_CONTRACT_ADDRESS_IDX] as `0x${string}` || constants.contracts.ballot.sepolia;
+  const contractAddress =
+    (parameters[ARG_CONTRACT_ADDRESS_IDX] as `0x${string}`) ||
+    constants.contracts.ballot.sepolia;
 
   if (!parameters || parameters.length < 1)
-    throw new Error("Parameters not provided. You must at least provide the target voter address.");
+    throw new Error(
+      "Parameters not provided. You must at least provide the target voter address.",
+    );
 
   if (!targetAddress) throw new Error("Target voter address not provided.");
 
   if (!/^0x[a-fA-F0-9]{40}$/.test(targetAddress))
     throw new Error("Invalid target voter address provided.");
 
-  if (!contractAddress) throw new Error("Contract address not provided. Either set this in your environment variables, or provide it in the arguments.");
+  if (!contractAddress)
+    throw new Error(
+      "Contract address not provided. Either set this in your environment variables, or provide it in the arguments.",
+    );
 
   if (!/^0x[a-fA-F0-9]{40}$/.test(contractAddress))
     throw new Error("Invalid contract address provided.");
 
-  console.log("scripts -> Delegate -> contract", contractAddress, "targetAddress", targetAddress);
+  console.log(
+    "scripts -> Delegate -> contract",
+    contractAddress,
+    "targetAddress",
+    targetAddress,
+  );
   const publicClient = createPublicClient({
     chain: sepolia,
     transport: http(constants.integrations.alchemy.sepolia),
@@ -36,20 +53,25 @@ async function main() {
   console.log("scripts -> Delegate -> last block number", blockNumber);
 
   // Create a wallet client
-  const deployer = privateKeyToAccount(`0x${constants.account.deployerPrivateKey}`);
+  const deployer = privateKeyToAccount(
+    `0x${constants.account.deployerPrivateKey}`,
+  );
   const walletClient = createWalletClient({
     account: deployer,
     chain: sepolia,
     transport: http(constants.integrations.alchemy.sepolia),
   });
-  console.log("scripts -> Delegate -> deployer address", walletClient.account.address);
+  console.log(
+    "scripts -> Delegate -> deployer address",
+    walletClient.account.address,
+  );
   const balance = await publicClient.getBalance({
     address: walletClient.account.address,
   });
   console.log(
     "scripts -> Delegate -> deployer balance",
     formatEther(balance),
-    walletClient.chain.nativeCurrency.symbol
+    walletClient.chain.nativeCurrency.symbol,
   );
 
   // Validate that the contract write will execute without errors.
@@ -57,19 +79,37 @@ async function main() {
     account: deployer,
     address: contractAddress,
     abi,
-    functionName: 'delegate',
+    functionName: "delegate",
     args: [targetAddress],
   });
   // console.log("scripts -> Delegate -> simulate -> request", request);
   // Execute the contract
   const hash = await walletClient.writeContract(request);
-  console.log("scripts -> Delegate -> transaction hash", hash, "waiting for confirmations...");
+  console.log(
+    "scripts -> Delegate -> transaction hash",
+    hash,
+    "waiting for confirmations...",
+  );
   const receipt = await publicClient.waitForTransactionReceipt({ hash });
-  const gasPrice = receipt.effectiveGasPrice ? formatEther(receipt.effectiveGasPrice) : "N/A";
+  const gasPrice = receipt.effectiveGasPrice
+    ? formatEther(receipt.effectiveGasPrice)
+    : "N/A";
   const gasUsed = receipt.gasUsed ? receipt.gasUsed.toString() : "N/A";
-  const totalPrice = receipt.effectiveGasPrice ? formatEther(receipt.effectiveGasPrice * receipt.gasUsed) : "N/A";
-  console.log("scripts -> Delegate -> transaction confirmed -> receipt", receipt.blockNumber);
-  console.log("scripts -> Delegate -> gas -> price", gasPrice, "used", gasUsed, "totalPrice", totalPrice);
+  const totalPrice = receipt.effectiveGasPrice
+    ? formatEther(receipt.effectiveGasPrice * receipt.gasUsed)
+    : "N/A";
+  console.log(
+    "scripts -> Delegate -> transaction confirmed -> receipt",
+    receipt.blockNumber,
+  );
+  console.log(
+    "scripts -> Delegate -> gas -> price",
+    gasPrice,
+    "used",
+    gasUsed,
+    "totalPrice",
+    totalPrice,
+  );
 
   if (receipt.status === "success") {
     console.log("scripts -> Delegate -> transaction succeeded");
@@ -79,7 +119,10 @@ async function main() {
 }
 
 main().catch((error) => {
-  const message = error instanceof Error ? ("reason" in error && error.reason) || error.message : "";
+  const message =
+    error instanceof Error
+      ? ("reason" in error && error.reason) || error.message
+      : "";
   console.error("scripts -> failed with error ->", message);
   // console.log("\n\nError details:");
   // console.error(error);

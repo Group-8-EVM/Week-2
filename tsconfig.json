@@ -37,7 +37,7 @@
       "@ignition/*": ["ignition/*"],
       "@lib/*": ["lib/*"],
       "@scripts/*": ["scripts/*"],
-      "@test/*": ["test/*"],
+      "@test/*": ["test/*"]
     },
     "strictNullChecks": true
   },

@@ -13,10 +13,9 @@ const config: HardhatUserConfig = {
       // url: "https://ethereum-sepolia-rpc.publicnode.com",
       url: `https://eth-sepolia.g.alchemy.com/v2/${providerApiKey}`,
       accounts: [deployerPrivateKey],
-    }
+    },
   },
 };
-
 
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   const accounts = await hre.viem.getWalletClients();

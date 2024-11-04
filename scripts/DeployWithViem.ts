@@ -1,9 +1,15 @@
-import { createPublicClient, http, createWalletClient, formatEther, hexToString, toHex } from "viem";
+import {
+  createPublicClient,
+  http,
+  createWalletClient,
+  formatEther,
+  hexToString,
+  toHex,
+} from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
 import { abi, bytecode } from "@artifacts/contracts/Ballot.sol/Ballot.json";
 import { constants } from "@lib/constants";
-
 
 async function main() {
   // Fetch proposals
@@ -23,14 +29,17 @@ async function main() {
     chain: sepolia,
     transport: http(constants.integrations.alchemy.sepolia),
   });
-  console.log("scripts -> DeployWithViem -> deployer address", deployer.account.address);
+  console.log(
+    "scripts -> DeployWithViem -> deployer address",
+    deployer.account.address,
+  );
   const balance = await publicClient.getBalance({
     address: deployer.account.address,
   });
   console.log(
     "scripts -> DeployWithViem -> deployer balance",
     formatEther(balance),
-    deployer.chain.nativeCurrency.symbol
+    deployer.chain.nativeCurrency.symbol,
   );
 
   // Deploy contract
@@ -40,14 +49,35 @@ async function main() {
     bytecode: bytecode as `0x${string}`,
     args: [proposals.map((prop) => toHex(prop, { size: 32 }))],
   });
-  console.log("scripts -> DeployWithViem -> transaction hash", hash, "waiting for confirmations...");
+  console.log(
+    "scripts -> DeployWithViem -> transaction hash",
+    hash,
+    "waiting for confirmations...",
+  );
   const receipt = await publicClient.waitForTransactionReceipt({ hash });
-  console.log("scripts -> DeployWithViem -> ballot contract deployed to", receipt.contractAddress);
-  const gasPrice = receipt.effectiveGasPrice ? formatEther(receipt.effectiveGasPrice) : "N/A";
+  console.log(
+    "scripts -> DeployWithViem -> ballot contract deployed to",
+    receipt.contractAddress,
+  );
+  const gasPrice = receipt.effectiveGasPrice
+    ? formatEther(receipt.effectiveGasPrice)
+    : "N/A";
   const gasUsed = receipt.gasUsed ? receipt.gasUsed.toString() : "N/A";
-  const totalCost = receipt.effectiveGasPrice ? formatEther(receipt.effectiveGasPrice * receipt.gasUsed) : "N/A";
-  console.log("scripts -> GiveRightToVote -> transaction confirmed -> receipt", receipt.blockNumber);
-  console.log("scripts -> GiveRightToVote -> gas -> price", gasPrice, "used", gasUsed, "totalCost", totalCost);
+  const totalCost = receipt.effectiveGasPrice
+    ? formatEther(receipt.effectiveGasPrice * receipt.gasUsed)
+    : "N/A";
+  console.log(
+    "scripts -> GiveRightToVote -> transaction confirmed -> receipt",
+    receipt.blockNumber,
+  );
+  console.log(
+    "scripts -> GiveRightToVote -> gas -> price",
+    gasPrice,
+    "used",
+    gasUsed,
+    "totalCost",
+    totalCost,
+  );
 
   // Reading information from a deployed contract
   console.log("scripts -> DeployWithViem -> proposals: ");

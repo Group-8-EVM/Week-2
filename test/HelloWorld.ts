@@ -36,7 +36,7 @@ describe("HelloWorld", function () {
 
   it("Should set owner to deployer account", async function () {
     const { helloWorldContract, owner } = await loadFixture(
-      deployContractFixture
+      deployContractFixture,
     );
     // https://hardhat.org/hardhat-runner/plugins/nomicfoundation-hardhat-viem#contracts
     const contractOwner = await helloWorldContract.read.owner();
@@ -46,22 +46,19 @@ describe("HelloWorld", function () {
 
   it("Should not allow anyone other than owner to call transferOwnership", async function () {
     const { helloWorldContract, otherAccount } = await loadFixture(
-      deployContractFixture
+      deployContractFixture,
     );
     // https://hardhat.org/hardhat-runner/plugins/nomicfoundation-hardhat-viem#retrieving-an-existing-contract
     const helloWorldContractAsOtherAccount = await viem.getContractAt(
-     
       "HelloWorld",
       helloWorldContract.address,
-      { client: { wallet: otherAccount } }
+      { client: { wallet: otherAccount } },
     );
     // https://www.chaijs.com/plugins/chai-as-promised/
     await expect(
-     
       helloWorldContractAsOtherAccount.write.transferOwnership([
-       
         otherAccount.account.address,
-      ])
+      ]),
     ).to.be.rejectedWith(nonOwnerError);
   });
 
@@ -70,7 +67,6 @@ describe("HelloWorld", function () {
       await loadFixture(deployContractFixture);
     // https://hardhat.org/hardhat-runner/plugins/nomicfoundation-hardhat-viem#contracts
     const txHash = await helloWorldContract.write.transferOwnership([
-     
       otherAccount.account.address,
     ]);
     // Transactions are instantly mined in the local network, but it is important to remember to await for confirmations when using a public network
@@ -79,49 +75,48 @@ describe("HelloWorld", function () {
     // https://viem.sh/docs/glossary/terms#transaction-receipt
     expect(receipt.status).to.equal("success");
     const contractOwner = await helloWorldContract.read.owner();
-    expect(contractOwner.toLowerCase()).to.equal(otherAccount?.account?.address);
+    expect(contractOwner.toLowerCase()).to.equal(
+      otherAccount?.account?.address,
+    );
     // It is important to check all relevant indirect effects in your tests
     const helloWorldContractAsPreviousAccount = await viem.getContractAt(
-     
       "HelloWorld",
       helloWorldContract.address,
-      { client: { wallet: owner } }
+      { client: { wallet: owner } },
     );
     await expect(
-     
       helloWorldContractAsPreviousAccount.write.transferOwnership([
-       
         owner.account.address,
-      ])
+      ]),
     ).to.be.rejectedWith(nonOwnerError);
   });
 
   it("Should not allow anyone other than owner to change text", async function () {
     // Call setText with someone other than the owner.
     const newText = "New Text";
-    const { helloWorldContract, otherAccount } = await loadFixture(deployContractFixture);
+    const { helloWorldContract, otherAccount } = await loadFixture(
+      deployContractFixture,
+    );
 
     // Interact with the contract as otherAccount
     const helloWorldContractAsOtherAccount = await viem.getContractAt(
-      
       "HelloWorld",
       helloWorldContract.address,
-      { client: { wallet: otherAccount } }
+      { client: { wallet: otherAccount } },
     );
 
     // Attempt to call setText as a non-owner
     await expect(
-      
-      helloWorldContractAsOtherAccount.write.setText([newText])
+      helloWorldContractAsOtherAccount.write.setText([newText]),
     ).to.be.rejectedWith(nonOwnerError);
   });
 
   it("Should change text correctly", async function () {
     const newText = "New Text";
-    const { publicClient, helloWorldContract } = await loadFixture(deployContractFixture);
-    const txHash = await helloWorldContract.write.setText([
-      newText,
-    ]);
+    const { publicClient, helloWorldContract } = await loadFixture(
+      deployContractFixture,
+    );
+    const txHash = await helloWorldContract.write.setText([newText]);
     const receipt = await publicClient.getTransactionReceipt({ hash: txHash });
     expect(receipt.status).to.equal("success");
     const helloWorldText = await helloWorldContract.read.helloWorld();
