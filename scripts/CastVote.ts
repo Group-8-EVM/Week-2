@@ -9,8 +9,12 @@ import {
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
-import { abi } from "@artifacts/contracts/Ballot.sol/Ballot.json";
-import { constants } from "@lib/constants";
+import { abi } from "../artifacts/contracts/Ballot.sol/Ballot.json";
+import * as dotenv from "dotenv";
+dotenv.config();
+
+const providerApiKey = process.env.ALCHEMY_API_KEY || "";
+const deployerPrivateKey = process.env.PRIVATE_KEY || "";
 
 const PROPOSAL_NAME_IDX = 0;
 
@@ -21,8 +25,7 @@ async function main() {
   const parameters = process.argv.slice(2);
   const proposalIndex = parameters[ARG_PROPOSAL_NO_IDX];
   const contractAddress =
-    (parameters[ARG_CONTRACT_ADDRESS_IDX] as `0x${string}`) ||
-    constants.contracts.ballot.sepolia;
+    (parameters[ARG_CONTRACT_ADDRESS_IDX] as `0x${string}`)
 
   if (!parameters || parameters.length < 1)
     throw new Error(
@@ -48,16 +51,17 @@ async function main() {
 
   const publicClient = createPublicClient({
     chain: sepolia,
-    transport: http(constants.integrations.alchemy.sepolia),
+    transport: http(`https://eth-sepolia.g.alchemy.com/v2/${providerApiKey}`),
   });
   const blockNumber = await publicClient.getBlockNumber();
   console.log("scripts -> CastVote -> last block number", blockNumber);
 
   // Create a wallet client
+  const account = privateKeyToAccount(`0x${deployerPrivateKey}`);
   const walletClient = createWalletClient({
-    account: privateKeyToAccount(`0x${constants.account.deployerPrivateKey}`),
+    account,
     chain: sepolia,
-    transport: http(constants.integrations.alchemy.sepolia),
+    transport: http(`https://eth-sepolia.g.alchemy.com/v2/${providerApiKey}`),
   });
   console.log(
     "scripts -> CastVote -> deployer address",
